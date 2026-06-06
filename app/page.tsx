@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Texture from "./texture.png";
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState(0);
@@ -8,11 +9,8 @@ export default function HomePage() {
   const [selectedTariff, setSelectedTariff] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  // Изначально поле пустое, как вы и просили
   const [insuredCount, setInsuredCount] = useState("");
   const [startDate, setStartDate] = useState("");
-
-  // Дата сегодня (локальное время) для ограничения прошлых дат
   const [todayStr] = useState(() => {
     const today = new Date();
     const year = today.getFullYear();
@@ -289,10 +287,11 @@ export default function HomePage() {
               <button
                 key={i}
                 tabIndex={-1}
+                style={activeTab === i ? { backgroundImage: `url(${Texture.src})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
                 className={`px-8 py-4 text-sm font-semibold transition-colors border-b-2 -mb-px flex-1 text-center
                   ${
                     activeTab === i
-                      ? "border-emerald-700 text-emerald-700 bg-white"
+                      ? "border-[#508223] text-[#fefefefe] bg-[#436d1d]"
                       : "border-transparent text-gray-400"
                   }`}
               >
@@ -302,7 +301,7 @@ export default function HomePage() {
           </div>
 
           <div className="p-8">
-            <h2 className="text-xl font-bold text-emerald-800 mb-6">
+            <h2 className="text-xl font-bold text-[#508223] mb-6">
               {tabs[activeTab]}
             </h2>
 
@@ -321,7 +320,7 @@ export default function HomePage() {
                     className={`w-full px-4 py-3 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:bg-white transition-all ${
                       errors.insuredCount
                         ? "border-red-400 focus:ring-red-400 bg-red-50/30"
-                        : "border-gray-200 focus:ring-emerald-600"
+                        : "border-gray-200 focus:ring-[#508223]"
                     }`}
                   />
                   {errors.insuredCount && (
@@ -359,7 +358,7 @@ export default function HomePage() {
                       className={`w-full px-4 py-3 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:bg-white cursor-pointer transition-all ${
                         errors.startDate
                           ? "border-red-400 focus:ring-red-400 bg-red-50/30"
-                          : "border-gray-200 focus:ring-emerald-600"
+                          : "border-gray-200 focus:ring-[#508223]"
                       }`}
                     />
                     {errors.startDate && (
@@ -395,7 +394,7 @@ export default function HomePage() {
                     className={`w-full px-4 py-3.5 bg-gray-50 border rounded-xl flex justify-between items-center text-left focus:outline-none focus:ring-2 focus:bg-white transition-all ${
                       errors.selectedTariff
                         ? "border-red-400 focus:ring-red-400 bg-red-50/30"
-                        : "border-gray-200 focus:ring-emerald-600"
+                        : "border-gray-200 focus:ring-[#508223]"
                     }`}
                   >
                     {selectedTariff ? (
@@ -441,7 +440,7 @@ export default function HomePage() {
                               return rest;
                             });
                           }}
-                          className="p-4 hover:bg-emerald-50/50 cursor-pointer transition-colors text-sm flex flex-col gap-1 text-gray-700"
+                          className="p-4 hover:bg-[#508223]/10 cursor-pointer transition-colors text-sm flex flex-col gap-1 text-gray-700"
                         >
                           <div className="flex justify-between">
                             <span>Стоимость полиса:</span>
@@ -465,7 +464,7 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={() => handleNextTab(1)}
-                    className="px-6 py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+                    className="px-6 py-3 bg-[#446e1e] hover:bg-[#385a18] text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
                   >
                     Следующий &gt;
                   </button>
@@ -478,7 +477,7 @@ export default function HomePage() {
               <div className="space-y-8">
                 {/* Раздел: Плательщик */}
                 <div className="border-b border-gray-100 pb-6">
-                  <h3 className="text-lg font-bold text-emerald-800 mb-4">
+                  <h3 className="text-lg font-bold text-[#508223] mb-4">
                     Плательщик
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -501,7 +500,7 @@ export default function HomePage() {
                         className={`w-full px-4 py-2.5 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:bg-white transition-all ${
                           errors.payerPassport
                             ? "border-red-400 focus:ring-red-400 bg-red-50/30"
-                            : "border-gray-200 focus:ring-emerald-600"
+                            : "border-gray-200 focus:ring-[#508223]"
                         }`}
                       />
                       {errors.payerPassport && (
@@ -529,7 +528,7 @@ export default function HomePage() {
                         className={`w-full px-4 py-2.5 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:bg-white transition-all ${
                           errors.payerBirthDate
                             ? "border-red-400 focus:ring-red-400 bg-red-50/30"
-                            : "border-gray-200 focus:ring-emerald-600"
+                            : "border-gray-200 focus:ring-[#508223]"
                         }`}
                       />
                       {errors.payerBirthDate && (
@@ -561,7 +560,7 @@ export default function HomePage() {
                         className={`w-full px-4 py-2.5 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:bg-white transition-all ${
                           errors.payerPhone
                             ? "border-red-400 focus:ring-red-400 bg-red-50/30"
-                            : "border-gray-200 focus:ring-emerald-600"
+                            : "border-gray-200 focus:ring-[#508223]"
                         }`}
                       />
                       {errors.payerPhone && (
@@ -587,13 +586,13 @@ export default function HomePage() {
                           className={`w-full pl-4 pr-10 py-2.5 bg-gray-50 border rounded-lg text-sm cursor-pointer text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
                             errors.payerFullName
                               ? "border-red-400 focus:ring-red-400 bg-red-50/30"
-                              : "border-gray-200 focus:ring-emerald-600"
+                              : "border-gray-200 focus:ring-[#508223]"
                           }`}
                         />
                         <button
                           type="button"
                           onClick={handlePayerNameClick}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-emerald-700 transition-colors"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#508223] transition-colors"
                           title="Поиск ФИО по паспорту"
                         >
                           🔍
@@ -611,7 +610,7 @@ export default function HomePage() {
 
                 {/* Раздел: Список застрахованных */}
                 <div>
-                  <h3 className="text-lg font-bold text-emerald-800 mb-4">
+                  <h3 className="text-lg font-bold text-[#508223] mb-4">
                     Застрахованное лицо(а)
                   </h3>
 
@@ -650,7 +649,7 @@ export default function HomePage() {
                             className={`w-full px-4 py-2.5 bg-white border rounded-lg focus:outline-none focus:ring-2 transition-all ${
                               errors[`insured_${insured.id}_passport`]
                                 ? "border-red-400 focus:ring-red-400 bg-red-50/30"
-                                : "border-gray-200 focus:ring-emerald-600"
+                                : "border-gray-200 focus:ring-[#508223]"
                             }`}
                           />
                           {errors[`insured_${insured.id}_passport`] && (
@@ -678,7 +677,7 @@ export default function HomePage() {
                             className={`w-full px-4 py-2.5 bg-white border rounded-lg focus:outline-none focus:ring-2 transition-all ${
                               errors[`insured_${insured.id}_birthDate`]
                                 ? "border-red-400 focus:ring-red-400 bg-red-50/30"
-                                : "border-gray-200 focus:ring-emerald-600"
+                                : "border-gray-200 focus:ring-[#508223]"
                             }`}
                           />
                           {errors[`insured_${insured.id}_birthDate`] && (
@@ -713,7 +712,7 @@ export default function HomePage() {
                             className={`w-full px-4 py-2.5 bg-white border rounded-lg focus:outline-none focus:ring-2 transition-all ${
                               errors[`insured_${insured.id}_phone`]
                                 ? "border-red-400 focus:ring-red-400 bg-red-50/30"
-                                : "border-gray-200 focus:ring-emerald-600"
+                                : "border-gray-200 focus:ring-[#508223]"
                             }`}
                           />
                           {errors[`insured_${insured.id}_phone`] && (
@@ -745,7 +744,7 @@ export default function HomePage() {
                               className={`w-full pl-4 pr-10 py-2.5 bg-white border rounded-lg text-sm cursor-pointer text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 transition-all ${
                                 errors[`insured_${insured.id}_fullName`]
                                   ? "border-red-400 focus:ring-red-400 bg-red-50/30"
-                                  : "border-gray-200 focus:ring-emerald-600"
+                                  : "border-gray-200 focus:ring-[#508223]"
                               }`}
                             />
                             <button
@@ -757,7 +756,7 @@ export default function HomePage() {
                                   insured.birthDate,
                                 )
                               }
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-emerald-700 transition-colors"
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#508223] transition-colors"
                               title="Поиск ФИО по паспорту"
                             >
                               🔍
@@ -777,7 +776,7 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={addInsuredPerson}
-                    className="mt-2 px-4 py-2 border border-dashed border-emerald-600 text-emerald-700 bg-emerald-50/30 hover:bg-emerald-50 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 mx-auto"
+                    className="mt-2 px-4 py-2 border border-dashed border-[#508223] text-[#508223] bg-[#508223]/10 hover:bg-[#508223]/20 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 mx-auto"
                   >
                     <span className="text-base">+</span> Добавить еще
                   </button>
@@ -797,14 +796,14 @@ export default function HomePage() {
                             return rest;
                           });
                       }}
-                      className="w-4 h-4 mt-1 accent-emerald-700 rounded focus:ring-emerald-600"
+                      className="w-4 h-4 mt-1 accent-[#508223] rounded focus:ring-[#508223]"
                     />
                     <label
                       htmlFor="oferta"
                       className="text-sm text-gray-600 select-none"
                     >
                       Ознакомлен(а) и согласен(а) с условиями{" "}
-                      <span className="text-emerald-700 font-semibold underline cursor-pointer hover:text-emerald-800">
+                      <span className="text-[#508223] font-semibold underline cursor-pointer hover:text-[#446e1e]">
                         публичной оферты
                       </span>
                     </label>
@@ -821,14 +820,14 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={() => setActiveTab(0)}
-                    className="px-6 py-3 border border-emerald-700 text-emerald-700 rounded-lg text-sm font-medium hover:bg-emerald-50 transition-colors"
+                    className="px-6 py-3 border border-[#508223] text-[#508223] rounded-lg text-sm font-medium hover:bg-[#508223]/10 transition-colors"
                   >
                     &lt; Назад
                   </button>
                   <button
                     type="button"
                     onClick={() => handleNextTab(2)}
-                    className="px-6 py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+                    className="px-6 py-3 bg-[#446e1e] hover:bg-[#385a18] text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
                   >
                     Следующий &gt;
                   </button>
@@ -905,14 +904,14 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={() => setActiveTab(1)}
-                    className="px-6 py-3 border border-emerald-700 text-emerald-700 rounded-lg text-sm font-medium hover:bg-emerald-50 transition-colors"
+                    className="px-6 py-3 border border-[#508223] text-[#508223] rounded-lg text-sm font-medium hover:bg-[#508223]/10 transition-colors"
                   >
                     &lt; Назад
                   </button>
                   <button
                     type="button"
                     disabled={!paymentMethod}
-                    className="px-8 py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg text-sm font-semibold transition-colors shadow-sm"
+                    className="px-8 py-3 bg-[#446e1e] hover:bg-[#385a18] disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg text-sm font-semibold transition-colors shadow-sm"
                   >
                     Оплатить
                   </button>
@@ -923,7 +922,7 @@ export default function HomePage() {
         </div>
 
         <div className="w-full md:w-72 bg-white rounded-2xl border border-gray-200 p-6 h-fit sticky top-8 shadow-sm">
-          <h3 className="text-base font-bold text-emerald-800 mb-4 border-b pb-2">
+          <h3 className="text-base font-bold text-[#508223] mb-4 border-b pb-2">
             Результаты расчета
           </h3>
           <div className="space-y-4 text-sm">
@@ -951,7 +950,7 @@ export default function HomePage() {
                   <>
                     <div>
                       <p className="text-gray-400 text-xs">Сумма покрытия:</p>
-                      <p className="font-bold text-emerald-900">
+                      <p className="font-bold text-[#508223]">
                         {tariffs[selectedTariff].coverage} UZS
                       </p>
                     </div>
@@ -963,11 +962,11 @@ export default function HomePage() {
                         {basePriceStr} UZS
                       </p>
                     </div>
-                    <div className="pt-2 border-t border-dashed border-gray-200 bg-emerald-50/40 p-2 rounded-lg">
+                    <div className="pt-2 border-t border-dashed border-gray-200 bg-[#508223]/10 p-2 rounded-lg">
                       <p className="text-gray-500 text-xs font-medium">
                         Итоговая цена:
                       </p>
-                      <p className="font-black text-emerald-800 text-base">
+                      <p className="font-black text-[#508223] text-base">
                         {totalPriceStr} UZS
                       </p>
                       {count > 1 && (
@@ -1000,7 +999,7 @@ export default function HomePage() {
             {paymentMethod && (
               <div className="pt-2 border-t border-gray-100">
                 <p className="text-gray-400 text-xs">Способ оплаты:</p>
-                <p className="font-bold text-emerald-800 flex items-center gap-1.5 capitalize">
+                <p className="font-bold text-[#508223] flex items-center gap-1.5 capitalize">
                   {paymentMethod === "click" ? " CLICK" : "PAYME"}
                 </p>
               </div>
