@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Texture from "./texture.png";
+import { RiSearchLine } from "@remixicon/react";
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState(0);
@@ -26,7 +27,7 @@ export default function HomePage() {
   const [payerFullName, setPayerFullName] = useState("");
   const [isAgreed, setIsAgreed] = useState(false);
 
-  // Список застрахованных
+  // Список застрахованных (используем статичный id: 1 для предотвращения ошибок гидратации Next.js)
   const [insuredList, setInsuredList] = useState([
     { id: 1, passport: "", birthDate: "", phone: "", fullName: "" },
   ]);
@@ -49,21 +50,20 @@ export default function HomePage() {
     "AE3559776_2004-04-24": { fullName: "XOLIQULOV ELYORBEK JAVLON O‘G‘LI" },
   };
 
-  // Динамический расчет цен в зависимости от количества человек
+  // Динамический расчет цен: в 1 табе не умножается, во 2 табе и далее умножается
   const getPrices = () => {
     if (!selectedTariff)
       return { basePriceStr: "", totalPriceStr: "", count: 0 };
     const tariff = tariffs[selectedTariff];
-    const basePriceNum = parseInt(tariff.price.replace(/\s/g, ""), 10);
     const count = insuredList.length;
-    const totalPriceNum = basePriceNum * count;
+    const basePriceNum = parseInt(tariff.price.replace(/\s/g, ""), 10);
 
-    const totalPriceStr = totalPriceNum
-      .toLocaleString("ru-RU")
-      .replace(/,/g, " ");
+    // Логика переключения: на первом табе (индекс 0) цена базовая, на остальных умножается
+    const totalPriceNum = activeTab === 0 ? basePriceNum : basePriceNum * count;
+
     return {
       basePriceStr: tariff.price,
-      totalPriceStr,
+      totalPriceStr: totalPriceNum.toLocaleString("ru-RU").replace(/,/g, " "),
       count,
     };
   };
@@ -71,13 +71,14 @@ export default function HomePage() {
   // Синхронизация инпута количества человек с массивом застрахованных лиц
   const handleInsuredCountChange = (val: string) => {
     setInsuredCount(val);
-    const count = parseInt(val, 10) || 1;
-    if (count > 0) {
+    const count = parseInt(val, 10);
+
+    if (!isNaN(count) && count > 0) {
       setInsuredList((prev) => {
         if (prev.length === count) return prev;
         if (prev.length < count) {
           const added = Array.from({ length: count - prev.length }, (_, i) => ({
-            id: Date.now() + i,
+            id: Date.now() + i + Math.random(),
             passport: "",
             birthDate: "",
             phone: "",
@@ -87,6 +88,11 @@ export default function HomePage() {
         }
         return prev.slice(0, count);
       });
+    } else {
+      // Если поле пустое, оставляем базовый элемент
+      setInsuredList([
+        { id: 1, passport: "", birthDate: "", phone: "", fullName: "" },
+      ]);
     }
   };
 
@@ -166,7 +172,6 @@ export default function HomePage() {
     if (!startDate) {
       newErrors.startDate = "Пожалуйста, выберите дату начала страхования";
     }
-    // Проверка на прошлое убрана, т.к. пользователь не может выбрать или ввести прошлую дату
     if (!selectedTariff) {
       newErrors.selectedTariff = "Пожалуйста, выберите подходящий тариф";
     }
@@ -245,7 +250,13 @@ export default function HomePage() {
   const addInsuredPerson = () => {
     const newList = [
       ...insuredList,
-      { id: Date.now(), passport: "", birthDate: "", phone: "", fullName: "" },
+      {
+        id: Date.now() + Math.random(),
+        passport: "",
+        birthDate: "",
+        phone: "",
+        fullName: "",
+      },
     ];
     setInsuredList(newList);
     setInsuredCount(newList.length.toString());
@@ -263,7 +274,7 @@ export default function HomePage() {
         if (item.id === id) {
           const updated = {
             ...item,
-            [field]: field === "passport" ? value.toUpperCase() : value,
+            [field]: field === "passport" ? value.toUpperCase().replace(/[^A-Z0-9]/g, "") : value,
           };
           return updated;
         }
@@ -279,15 +290,21 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800">
       <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row gap-6">
-        {/* Главная форма */}
         <div className="flex-1 bg-white rounded-2xl border border-gray-200 shadow-sm relative">
-          {/* Навигационная панель по табам */}
           <div className="flex border-b border-gray-200 bg-gray-50 rounded-t-2xl overflow-hidden pointer-events-none">
             {tabs.map((tab, i) => (
               <button
                 key={i}
                 tabIndex={-1}
-                style={activeTab === i ? { backgroundImage: `url(${Texture.src})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+                style={
+                  activeTab === i
+                    ? {
+                        backgroundImage: `url(${Texture.src})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }
+                    : {}
+                }
                 className={`px-8 py-4 text-sm font-semibold transition-colors border-b-2 -mb-px flex-1 text-center
                   ${
                     activeTab === i
@@ -317,6 +334,7 @@ export default function HomePage() {
                     min={1}
                     value={insuredCount}
                     onChange={(e) => handleInsuredCountChange(e.target.value)}
+                    onWheel={(e) => e.currentTarget.blur()}
                     className={`w-full px-4 py-3 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:bg-white transition-all ${
                       errors.insuredCount
                         ? "border-red-400 focus:ring-red-400 bg-red-50/30"
@@ -325,7 +343,6 @@ export default function HomePage() {
                   />
                   {errors.insuredCount && (
                     <p className="text-red-500 text-xs mt-1.5 font-medium flex items-center gap-1">
-                      {" "}
                       {errors.insuredCount}
                     </p>
                   )}
@@ -342,9 +359,8 @@ export default function HomePage() {
                       min={todayStr}
                       max="2100-12-31"
                       value={startDate}
-                      onKeyDown={(e) => e.preventDefault()} // Блокировка ввода с клавиатуры
+                      onKeyDown={(e) => e.preventDefault()}
                       onClick={(e) => {
-                        // @ts-ignore - Для открытия календаря при клике на поле
                         if (e.currentTarget.showPicker)
                           e.currentTarget.showPicker();
                       }}
@@ -381,7 +397,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Выпадающий список тарифов */}
                 <div className="relative">
                   <label className="block text-sm text-gray-700 mb-2 font-medium">
                     <span className="text-red-500 mr-1">*</span>
@@ -491,7 +506,9 @@ export default function HomePage() {
                         placeholder="AA1234567"
                         value={payerPassport}
                         onChange={(e) => {
-                          setPayerPassport(e.target.value.toUpperCase());
+                          // Регулярное выражение разрешает только английские (латинские) буквы и цифры
+                          const cleanVal = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+                          setPayerPassport(cleanVal);
                           setErrors((prev) => {
                             const { payerPassport, ...rest } = prev;
                             return rest;
@@ -595,12 +612,13 @@ export default function HomePage() {
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#508223] transition-colors"
                           title="Поиск ФИО по паспорту"
                         >
-                          🔍
+                          <RiSearchLine
+                            size={24}
+                          />
                         </button>
                       </div>
                       {errors.payerFullName && (
                         <p className="text-red-500 text-xs mt-1 font-medium">
-                          {" "}
                           {errors.payerFullName}
                         </p>
                       )}
@@ -759,7 +777,9 @@ export default function HomePage() {
                               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#508223] transition-colors"
                               title="Поиск ФИО по паспорту"
                             >
-                              🔍
+                              <RiSearchLine
+                                size={24} 
+                              />
                             </button>
                           </div>
                           {errors[`insured_${insured.id}_fullName`] && (
@@ -955,44 +975,42 @@ export default function HomePage() {
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-400 text-xs">
-                        Цена самого тарифа:
-                      </p>
+                      <p className="text-gray-400 text-xs">Стоимость полиса:</p>
                       <p className="font-semibold text-gray-700">
                         {basePriceStr} UZS
                       </p>
                     </div>
                     <div className="pt-2 border-t border-dashed border-gray-200 bg-[#508223]/10 p-2 rounded-lg">
                       <p className="text-gray-500 text-xs font-medium">
-                        Итоговая цена:
+                        Общая сумма оплаты{" "}
+                        {activeTab > 0 && count > 1 && (
+                          <span className="text-xs text-gray-400 font-normal italic mt-0.5">
+                            ({count}×):
+                          </span>
+                        )}
                       </p>
                       <p className="font-black text-[#508223] text-base">
                         {totalPriceStr} UZS
                       </p>
-                      {count > 1 && (
-                        <p className="text-xs text-gray-400 font-normal italic mt-0.5">
-                          ({basePriceStr} × {count})
-                        </p>
-                      )}
                     </div>
                   </>
                 );
               })()}
 
-            {payerFullName && (
+            {/* Вывод динамического списка застрахованных лиц */}
+            {insuredList.some((ins) => ins.fullName || ins.passport) && (
               <div className="pt-2 border-t border-gray-100">
-                <p className="text-gray-400 text-xs">Плательщик:</p>
-                <p className="font-semibold text-gray-900 truncate">
-                  {payerFullName}
-                </p>
-              </div>
-            )}
-            {payerPhone && (
-              <div>
-                <p className="text-gray-400 text-xs">Телефон:</p>
-                <p className="font-semibold text-gray-900">
-                  {formatPhoneDisplay(payerPhone)}
-                </p>
+                <p className="text-gray-400 text-xs mb-1">Застрахованные лица:</p>
+                <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                  {insuredList.map((insured, index) => {
+                    if (!insured.fullName && !insured.passport) return null;
+                    return (
+                      <p key={insured.id} className="font-semibold text-gray-900 text-xs leading-tight">
+                        {index + 1}. {insured.fullName || "—"} {insured.passport ? `• ${insured.passport}` : ""}
+                      </p>
+                    );
+                  })}
+                </div>
               </div>
             )}
 
