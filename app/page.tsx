@@ -27,7 +27,6 @@ export default function HomePage() {
   const [payerFullName, setPayerFullName] = useState("");
   const [isAgreed, setIsAgreed] = useState(false);
 
-  // Список застрахованных (используем статичный id: 1 для предотвращения ошибок гидратации Next.js)
   const [insuredList, setInsuredList] = useState([
     { id: 1, passport: "", birthDate: "", phone: "", fullName: "" },
   ]);
@@ -49,8 +48,6 @@ export default function HomePage() {
   const mockDatabase: { [key: string]: { fullName: string } } = {
     "AE3559776_2004-04-24": { fullName: "XOLIQULOV ELYORBEK JAVLON O‘G‘LI" },
   };
-
-  // Динамический расчет цен: в 1 табе не умножается, во 2 табе и далее умножается
   const getPrices = () => {
     if (!selectedTariff)
       return { basePriceStr: "", totalPriceStr: "", count: 0 };
@@ -58,7 +55,6 @@ export default function HomePage() {
     const count = insuredList.length;
     const basePriceNum = parseInt(tariff.price.replace(/\s/g, ""), 10);
 
-    // Логика переключения: на первом табе (индекс 0) цена базовая, на остальных умножается
     const totalPriceNum = activeTab === 0 ? basePriceNum : basePriceNum * count;
 
     return {
@@ -68,7 +64,6 @@ export default function HomePage() {
     };
   };
 
-  // Синхронизация инпута количества человек с массивом застрахованных лиц
   const handleInsuredCountChange = (val: string) => {
     setInsuredCount(val);
     const count = parseInt(val, 10);
@@ -89,7 +84,6 @@ export default function HomePage() {
         return prev.slice(0, count);
       });
     } else {
-      // Если поле пустое, оставляем базовый элемент
       setInsuredList([
         { id: 1, passport: "", birthDate: "", phone: "", fullName: "" },
       ]);
@@ -274,7 +268,10 @@ export default function HomePage() {
         if (item.id === id) {
           const updated = {
             ...item,
-            [field]: field === "passport" ? value.toUpperCase().replace(/[^A-Z0-9]/g, "") : value,
+            [field]:
+              field === "passport"
+                ? value.toUpperCase().replace(/[^A-Z0-9]/g, "")
+                : value,
           };
           return updated;
         }
@@ -326,7 +323,6 @@ export default function HomePage() {
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm text-gray-700 mb-2 font-medium">
-                    <span className="text-red-500 mr-1">*</span>
                     Число застрахованных:
                   </label>
                   <input
@@ -351,7 +347,6 @@ export default function HomePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm text-gray-700 mb-2 font-medium">
-                      <span className="text-red-500 mr-1">*</span>
                       Начало страхования:
                     </label>
                     <input
@@ -399,7 +394,6 @@ export default function HomePage() {
 
                 <div className="relative">
                   <label className="block text-sm text-gray-700 mb-2 font-medium">
-                    <span className="text-red-500 mr-1">*</span>
                     Выбор тарифа:
                   </label>
 
@@ -443,7 +437,7 @@ export default function HomePage() {
                   )}
 
                   {isTariffOpen && (
-                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl max-h-[400px] overflow-y-auto divide-y divide-gray-100">
+                    <div className="absolute z-50 w-full bottom-full mb-2 min-[800px]:top-full min-[800px]:bottom-auto min-[800px]:mb-0 min-[800px]:mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl max-h-[220px] overflow-y-auto divide-y divide-gray-100">
                       {Object.entries(tariffs).map(([key, val]) => (
                         <div
                           key={key}
@@ -455,7 +449,7 @@ export default function HomePage() {
                               return rest;
                             });
                           }}
-                          className="p-4 hover:bg-[#508223]/10 cursor-pointer transition-colors text-sm flex flex-col gap-1 text-gray-700"
+                          className="py-2.5 px-4 hover:bg-[#508223]/10 cursor-pointer transition-colors text-sm flex flex-col gap-0.5 text-gray-700"
                         >
                           <div className="flex justify-between">
                             <span>Стоимость полиса:</span>
@@ -487,10 +481,8 @@ export default function HomePage() {
               </div>
             )}
 
-            {/* TAB 1: Застрахованные лица */}
             {activeTab === 1 && (
               <div className="space-y-8">
-                {/* Раздел: Плательщик */}
                 <div className="border-b border-gray-100 pb-6">
                   <h3 className="text-lg font-bold text-[#508223] mb-4">
                     Плательщик
@@ -498,16 +490,16 @@ export default function HomePage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm text-gray-600 mb-1 font-medium">
-                        <span className="text-red-500 mr-1">*</span> Серия и
-                        номер паспорта:
+                        Серия и номер паспорта:
                       </label>
                       <input
                         type="text"
                         placeholder="AA1234567"
                         value={payerPassport}
                         onChange={(e) => {
-                          // Регулярное выражение разрешает только английские (латинские) буквы и цифры
-                          const cleanVal = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+                          const cleanVal = e.target.value
+                            .toUpperCase()
+                            .replace(/[^A-Z0-9]/g, "");
                           setPayerPassport(cleanVal);
                           setErrors((prev) => {
                             const { payerPassport, ...rest } = prev;
@@ -529,8 +521,7 @@ export default function HomePage() {
                     </div>
                     <div>
                       <label className="block text-sm text-gray-600 mb-1 font-medium">
-                        <span className="text-red-500 mr-1">*</span> Дата
-                        рождения:
+                        Дата рождения:
                       </label>
                       <input
                         type="date"
@@ -560,8 +551,7 @@ export default function HomePage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div>
                       <label className="block text-sm text-gray-600 mb-1 font-medium">
-                        <span className="text-red-500 mr-1">*</span> Номер
-                        телефона:
+                        Номер телефона:
                       </label>
                       <input
                         type="tel"
@@ -590,8 +580,7 @@ export default function HomePage() {
 
                     <div>
                       <label className="block text-sm text-gray-600 mb-1 font-medium">
-                        <span className="text-red-500 mr-1">*</span> Имя и
-                        фамилия:
+                        Имя и фамилия:
                       </label>
                       <div className="relative">
                         <input
@@ -612,9 +601,7 @@ export default function HomePage() {
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#508223] transition-colors"
                           title="Поиск ФИО по паспорту"
                         >
-                          <RiSearchLine
-                            size={24}
-                          />
+                          <RiSearchLine size={24} />
                         </button>
                       </div>
                       {errors.payerFullName && (
@@ -626,7 +613,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Раздел: Список застрахованных */}
                 <div>
                   <h3 className="text-lg font-bold text-[#508223] mb-4">
                     Застрахованное лицо(а)
@@ -650,8 +636,7 @@ export default function HomePage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                         <div>
                           <label className="block text-sm text-gray-600 mb-1 font-medium">
-                            <span className="text-red-500 mr-1">*</span> Серия и
-                            номер паспорта лица #{index + 1}:
+                            Серия и номер паспорта лица #{index + 1}:
                           </label>
                           <input
                             type="text"
@@ -679,8 +664,7 @@ export default function HomePage() {
                         </div>
                         <div>
                           <label className="block text-sm text-gray-600 mb-1 font-medium">
-                            <span className="text-red-500 mr-1">*</span> Дата
-                            рождения лица #{index + 1}:
+                            Дата рождения лица #{index + 1}:
                           </label>
                           <input
                             type="date"
@@ -710,8 +694,7 @@ export default function HomePage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm text-gray-600 mb-1 font-medium">
-                            <span className="text-red-500 mr-1">*</span> Номер
-                            телефона лица #{index + 1}:
+                            Номер телефона лица #{index + 1}:
                           </label>
                           <input
                             type="text"
@@ -743,8 +726,7 @@ export default function HomePage() {
 
                         <div>
                           <label className="block text-sm text-gray-600 mb-1 font-medium">
-                            <span className="text-red-500 mr-1">*</span> Имя и
-                            фамилия застрахованного:
+                            Имя и фамилия застрахованного:
                           </label>
                           <div className="relative">
                             <input
@@ -777,9 +759,7 @@ export default function HomePage() {
                               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#508223] transition-colors"
                               title="Поиск ФИО по паспорту"
                             >
-                              <RiSearchLine
-                                size={24} 
-                              />
+                              <RiSearchLine size={24} />
                             </button>
                           </div>
                           {errors[`insured_${insured.id}_fullName`] && (
@@ -859,7 +839,6 @@ export default function HomePage() {
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm text-gray-700 mb-4 font-medium">
-                    <span className="text-red-500 mr-1">*</span>
                     Выберите способ оплаты:
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -997,16 +976,21 @@ export default function HomePage() {
                 );
               })()}
 
-            {/* Вывод динамического списка застрахованных лиц */}
             {insuredList.some((ins) => ins.fullName || ins.passport) && (
               <div className="pt-2 border-t border-gray-100">
-                <p className="text-gray-400 text-xs mb-1">Застрахованные лица:</p>
+                <p className="text-gray-400 text-xs mb-1">
+                  Застрахованные лица:
+                </p>
                 <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
                   {insuredList.map((insured, index) => {
                     if (!insured.fullName && !insured.passport) return null;
                     return (
-                      <p key={insured.id} className="font-semibold text-gray-900 text-xs leading-tight">
-                        {index + 1}. {insured.fullName || "—"} {insured.passport ? `• ${insured.passport}` : ""}
+                      <p
+                        key={insured.id}
+                        className="font-semibold text-gray-900 text-xs leading-tight"
+                      >
+                        {index + 1}. {insured.fullName || "—"}{" "}
+                        {insured.passport ? `• ${insured.passport}` : ""}
                       </p>
                     );
                   })}
